@@ -22,7 +22,7 @@ function init() {
   
         connection.onmessage = function (message) {
             fileName = message.data;
-            fileLocation = 'https://' + window.location.host + '/w/'+ fileName;
+            fileLocation = 'http://' + window.location.host + '/w/'+ fileName;
 
             var recButton = document.getElementById('record');
             recButton.innerHTML = "Cancel";
@@ -35,6 +35,7 @@ function init() {
         }
         connection.onclose = function () {
             AbleToRecord = true;
+            connection = null;
            
 
 
@@ -60,7 +61,7 @@ function init() {
 
             }else{
                 AbleToRecord = false;
-          
+                $('#share').hide();
                 connection.close();
 
                 $('#share').html('<p style="color:#d6d6f5;">Lived on: </p><a onclick="window.open(\''+fileLocation+'\');" style="color:#ffffff;">'+fileLocation+'</a>');
@@ -79,7 +80,7 @@ function init() {
     map = document.getElementById('map');
     // console.log(map);
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
+        zoom: 17,
         center: {lat: 40.8075355, lng: -73.9625727},
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
@@ -89,13 +90,25 @@ function init() {
         map: map,
         position: map.getCenter()
     });
-    geo_marker.setVisible(true);
+  
     map.addListener('click', function(e) {
       geo_marker.setPosition(e.latLng);
-      map.setZoom(15); 
+      map.setZoom(17); 
       map.panTo(e.latLng);
       console.log(e.latLng.lat());
-      
+      if(AbleToRecord){
+           if(connection != null){
+          //console.log(place.geometry.location.lat()+""+place.geometry.location.lng());
+          var obj = new Object();
+          obj.action = "sos_live_loc";
+          obj.lat = e.latLng.lat();
+          obj.lng = e.latLng.lng();
+          connection.send(JSON.stringify(obj));
+          }else{
+               getWebSocket(); 
+          return;
+         }
+      }
     });
 
 

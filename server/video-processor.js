@@ -116,23 +116,22 @@ module.exports = function (app) {
         ws.name = hashid;
         console.log('new connection established');
         ws.on('message', function(data) {
-            if (data instanceof Buffer) {
-                StoreDataToWebm(data, hashid, ws);
-                if(!room[hashid]){
-                    room[hashid] = [ws];
-                    host.push(ws);
-                }
-            }else{
+          
                data = JSON.parse(data);
+       
                if(data["join"] && room[data["join"]]){
                     room[data["join"]].push(ws);
+               }else if(data["action"]=="sos_live_loc"){
+                    console.log(data["lat"]); 
+                    console.log(data["lng"]); 
+
                }else if(data["join"] && !room[data["join"]]){
                     // var para = {};
                     // para["end"]=1;
                     // ws.send(JSON.stringify(para));
                     ws.close();
+               
                }
-            }
             // console.log(room);
         });
         ws.on('close', function(data) {
