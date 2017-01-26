@@ -1,4 +1,4 @@
-var map;
+var map,geo_marker;
 function init() {
     var recorder;
     var mediaStream;
@@ -8,7 +8,7 @@ function init() {
     var AbleToRecord = true;
     var port = 9000;
 
-    console.log("in map")
+    // console.log("in map")
 
     function getWebSocket() {
          if (window.location.protocol == 'http:') {
@@ -77,14 +77,26 @@ function init() {
         }
     });
     map = document.getElementById('map');
-    console.log(map);
+    // console.log(map);
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
+        zoom: 15,
         center: {lat: 40.8075355, lng: -73.9625727},
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
-    console.log(map);
+    // console.log(map);
     // getVideoStream();
+    geo_marker = new google.maps.Marker({
+        map: map,
+        position: map.getCenter()
+    });
+    geo_marker.setVisible(true);
+    map.addListener('click', function(e) {
+      geo_marker.setPosition(e.latLng);
+      map.setZoom(15); 
+      map.panTo(e.latLng);
+      console.log(e.latLng.lat());
+      
+    });
 
 
    
