@@ -76,12 +76,14 @@ function init() {
             }
         }
     });
- 
+    map = document.getElementById('map');
+    console.log(map);
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: {lat: -40, lng: 121},
+        zoom: 12,
+        center: {lat: 40.8075355, lng: -73.9625727},
         mapTypeId: google.maps.MapTypeId.ROADMAP
     });
+    console.log(map);
     // getVideoStream();
 
 
