@@ -50,7 +50,7 @@ Chat.connect = (function(host) {
     };
 
     Chat.socket.onmessage = function (message) {
-    	// console.log(message.data);
+    	  console.log(message.data);
 
      
         return false;

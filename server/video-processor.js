@@ -121,7 +121,15 @@ module.exports = function (app) {
        
                if(data["join"] && room[data["join"]]){
                     room[data["join"]].push(ws);
-               }else if(data["action"]=="sos_live_loc"){
+               }else if(data["action"]=="sos_live_loc" && !room[hashid]){
+                    room[hashid] = [];
+                    room[hashid].push(ws);
+                    console.log(data["lat"]); 
+                    console.log(data["lng"]); 
+
+               }else if(data["action"]=="sos_live_loc" && room[hashid]){
+                 
+                   broadcast(ws,hashid,"help",data["lat"]+","+data["lng"]);
                     console.log(data["lat"]); 
                     console.log(data["lng"]); 
 
