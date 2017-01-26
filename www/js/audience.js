@@ -2,9 +2,18 @@
 var Chat = {},token,map, cur = null;
 Chat.socket = null;
 var sourceBuffer = null, ms;
+var flightPlanCoordinates = [];
+var flightPath;
 
 function init(){
   Chat.initialize();
+  flightPath = new google.maps.Polyline({
+    strokeColor: '#FF0000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+
+  flightPath.setMap(map);
   console.log("in");
 
 }
@@ -74,6 +83,13 @@ function plotPoints(data){
     cur.setPosition(latlng);
     map.setZoom(17); 
     map.panTo(latlng);
+    var path = flightPath.getPath();
+    console.log(path);
+  // Because path is an MVCArray, we can simply append a new coordinate
+  // and it will automatically appear.
+    path.push(latlng);
+    flightPath.setMap(map);
+
     console.log(latlng);
 }  
 
