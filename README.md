@@ -5,5 +5,5 @@
 2. npm install
 3. cd server
 4. node index.js
-5. Point your browser to: [http://localhost:5566](http://localhost:9000) 
+5. Point your browser to: [http://localhost:9000](http://localhost:9000) 
 
