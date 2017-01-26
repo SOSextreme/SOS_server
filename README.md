@@ -1,4 +1,4 @@
-# amLive
+# SOS extreme
 
 ## run
 1. [install node](https://nodejs.org/en/download/package-manager/)
