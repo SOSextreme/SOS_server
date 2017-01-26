@@ -1,5 +1,5 @@
 
-var Chat = {},token,map;
+var Chat = {},token,map, cur = null;
 Chat.socket = null;
 var sourceBuffer = null, ms;
 
@@ -51,6 +51,8 @@ Chat.connect = (function(host) {
 
     Chat.socket.onmessage = function (message) {
     	  console.log(message.data);
+        var action = JSON.parse(message.data);
+        if(action["help"] != null) plotPoints(action["help"]);
 
      
         return false;
@@ -58,6 +60,22 @@ Chat.connect = (function(host) {
 
 });
   
+
+function plotPoints(data){
+    var latlng = data.split(",");
+    latlng  = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
+    if(cur==null){
+        cur = new google.maps.Marker({
+        map: map,
+        position:  latlng
+    });
+    }
+ 
+    cur.setPosition(latlng);
+    map.setZoom(17); 
+    map.panTo(latlng);
+    console.log(latlng);
+}  
 
 Chat.initialize = function() {
 	loc_str = window.location.toString();
