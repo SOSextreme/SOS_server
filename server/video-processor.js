@@ -10,7 +10,7 @@ var host = [];
 var room = {};
 var prevFilePath = '';
 
-function StoreDataToWebm(data, hashid, ws) {
+/*function StoreDataToWebm(data, hashid, ws) {
     var filePath = '../www/w/';
     if (!fs.existsSync(filePath)){
         fs.mkdirSync(filePath);
@@ -42,6 +42,7 @@ function StoreDataToWebm(data, hashid, ws) {
         fs.appendFileSync(filePath + hashid + videoFileExtension, data);
     }
 }
+*/
 function broadcast_binary(ws,hashid,data){
     // var para = {};
     // para[key] = data.toString();
@@ -75,12 +76,13 @@ function broadcast(ws,hashid,key,data){
     }
 }
 
-function deleteRealDir(hashid) {
+/*function deleteRealDir(hashid) {
     var filePath = '../www/w/';
     var livePath = filePath+hashid+'/';
     deleteFolderRecursive(livePath);
 
 }
+*/
 var deleteFolderRecursive = function(path) {
   if( fs.existsSync(path) ) {
     fs.readdirSync(path).forEach(function(file,index){
@@ -112,24 +114,31 @@ module.exports = function (app) {
     // console.log(app.ws)
     app.ws('/', function (ws, req) {
       
-        var hashid = uuid();
-        ws.name = hashid;
+        //var hashid = uuid();
+        //ws.name = hashid;
+		var fbid = null;
         console.log('new connection established');
         ws.on('message', function(data) {
           
                data = JSON.parse(data);
-       
+			   console.log(data);
+               console.log(room[data["fbid"]]);
+			   
+			   //var fbid = data["fbid"];
                if(data["join"] && room[data["join"]]){
                     room[data["join"]].push(ws);
-               }else if(data["action"]=="sos_live_loc" && !room[hashid]){
-                    room[hashid] = [];
-                    room[hashid].push(ws);
-                    console.log(data["lat"]); 
-                    console.log(data["lng"]); 
+               }else if(data["action"]=="sos_live_loc" && data["fbid"]){   //client pass json, id location
+                    fbid = parseInt(data["fbid"],10); 
+					room[fbid] = [];
+                    room[fbid].push(ws);
+					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
+                    //console.log(room); 
+                    //console.log(data["lng"]); 
+					ws.send(data["fbid"].toString());
 
-               }else if(data["action"]=="sos_live_loc" && room[hashid]){
+               }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
                  
-                   broadcast(ws,hashid,"help",data["lat"]+","+data["lng"]);
+                    broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
                     console.log(data["lat"]); 
                     console.log(data["lng"]); 
 
@@ -149,15 +158,15 @@ module.exports = function (app) {
             if(checkhost!= -1){
                 var delid = host[checkhost].name;
                 // console.log(host[checkhost].name);
-                broadcast(ws,delid,"end",1);
-                deleteRealDir(delid);
+                // broadcast(ws,delid,"end",1);
+                // deleteRealDir(delid);
                 delete host[checkhost]; 
                 close_subscriptions(ws,delid);
                 delete room[delid];
             }
        
         });
-        ws.send(hashid);
+        //ws.send(hashid);
     });
  
 };

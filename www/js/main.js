@@ -21,6 +21,7 @@ function init() {
         // var websocketEndpoint = 'ws://localhost:' + port;
   
         connection.onmessage = function (message) {
+			console.log(message);
             fileName = message.data;
             fileLocation = 'http://' + window.location.host + '/w/'+ fileName;
 
@@ -41,7 +42,18 @@ function init() {
 
         }
         connection.onopen = function () {
-            
+         //generate uuid and send to server. include location.   check geo_marker
+		 var obj = new Object();
+		 obj.action = "sos_live_loc";
+		 obj.fbid=123;
+		 if (geo_marker!=null){
+			 obj.lat = geo_marker.getPosition().lat();
+			 obj.lng = geo_marker.getPosition().lng();
+		 }
+		 //console.log(obj);
+		 
+		 connection.send(JSON.stringify(obj));
+		 
          
 
 
