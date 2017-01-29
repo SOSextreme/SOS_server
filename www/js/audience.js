@@ -83,10 +83,9 @@ function plotHistory(data){
 				map: map,
 				position:  latlng
 				});
+			}else{
+				cur.setPosition(latlng);
 			}
- 
-		cur.setPosition(latlng);	
-			
 		}
 	}
 	    
@@ -102,9 +101,10 @@ function plotPoints(data){
         map: map,
         position:  latlng
     });
-    }
+    }else{
+		cur.setPosition(latlng);
+	}
  
-    cur.setPosition(latlng);
     map.setZoom(17); 
     map.panTo(latlng);
     var path = flightPath.getPath();
