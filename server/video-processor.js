@@ -8,6 +8,7 @@ require('date-utils');
 var videoFileExtension = '.webm';
 var host = [];
 var room = {};
+var historylog = {};
 var prevFilePath = '';
 
 /*function StoreDataToWebm(data, hashid, ws) {
@@ -118,20 +119,28 @@ module.exports = function (app) {
         //ws.name = hashid;
 		var fbid = null;
         console.log('new connection established');
+		
         ws.on('message', function(data) {
           
                data = JSON.parse(data);
 			   console.log(data);
-               console.log(room[data["fbid"]]);
+               //console.log(room[data["fbid"]]);
 			   
 			   //var fbid = data["fbid"];
                if(data["join"] && room[data["join"]]){
                     room[data["join"]].push(ws);
+					var para = {};
+					para["history"] = historylog[data["join"]];
+					console.log(historylog[data["join"]]);
+					ws.send(JSON.stringify(para));
                }else if(data["action"]=="sos_live_loc" && data["fbid"]){   //client pass json, id location
                     fbid = parseInt(data["fbid"],10); 
-					room[fbid] = [];
-                    room[fbid].push(ws);
+					room[fbid] = [ws];
+                    //room[fbid].push(ws);
 					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
+					historylog[fbid]=[[data["lat"],data["lng"]]];
+					//console.log(historylog);
+					
                     //console.log(room); 
                     //console.log(data["lng"]); 
 					ws.send(data["fbid"].toString());
@@ -141,6 +150,8 @@ module.exports = function (app) {
                     broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
                     console.log(data["lat"]); 
                     console.log(data["lng"]); 
+					historylog[fbid].push([data["lat"],data["lng"]]);
+					console.log(historylog);
 
                }else if(data["join"] && !room[data["join"]]){
                     // var para = {};
@@ -149,7 +160,8 @@ module.exports = function (app) {
                     ws.close();
                
                }
-            // console.log(room);
+			   
+             //console.log(historylog);
         });
         ws.on('close', function(data) {
             //reload clients' <video> to full video 

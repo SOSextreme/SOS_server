@@ -61,15 +61,39 @@ Chat.connect = (function(host) {
     Chat.socket.onmessage = function (message) {
     	  console.log(message.data);
         var action = JSON.parse(message.data);
+		if(action["history"] != null) plotHistory(action["history"]);
         if(action["help"] != null) plotPoints(action["help"]);
-
+		//console.log(action["history"]);
+		//console.log(action["help"]);
      
         return false;
     };
 
 });
   
-
+function plotHistory(data){
+	for (var i = 0; i < data.length; i++){
+		var latlng = data[i];
+		latlng = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
+		var path = flightPath.getPath();
+		path.push(latlng);
+		if (i == data.length - 1){
+			if(cur==null){
+				cur = new google.maps.Marker({
+				map: map,
+				position:  latlng
+				});
+			}
+ 
+		cur.setPosition(latlng);	
+			
+		}
+	}
+	    
+	flightPath.setMap(map);
+	
+}
+  
 function plotPoints(data){
     var latlng = data.split(",");
     latlng  = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
