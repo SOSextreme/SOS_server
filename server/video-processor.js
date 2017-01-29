@@ -10,6 +10,14 @@ var host = [];
 var room = {};
 var historylog = {};
 var prevFilePath = '';
+var env = require('dotenv').load();
+console.log(process.env.accountSid);
+var accountSid = process.env.accountSid;
+var authToken = process.env.authToken;
+var client = require('twilio')(accountSid, authToken);
+var toNumber = process.env.toNumber;
+var fromNumber = process.env.fromNumber;
+
 
 /*function StoreDataToWebm(data, hashid, ws) {
     var filePath = '../www/w/';
@@ -144,6 +152,13 @@ module.exports = function (app) {
                     //console.log(room); 
                     //console.log(data["lng"]); 
 					ws.send(data["fbid"].toString());
+					client.calls.create({                                  //make outbound call
+						url: "http://demo.twilio.com/docs/voice.xml",
+						to: toNumber,
+						from: fromNumber
+					}, function(err, call) {
+							process.stdout.write(call.sid);
+						});
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
                  

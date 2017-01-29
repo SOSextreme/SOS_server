@@ -3,23 +3,22 @@
   "version": "0.0.1",
   "description": "live lecture",
   "main": "index.html",
-  "scripts": {},
+  "scripts": {
+    "start": "node server/index.js"
+  },
   "repository": {
     "type": "git",
     "url": ""
   },
   "dependencies": {
+    "date-utils": "1.2.21",
+    "dotenv": "^4.0.0",
+    "ejs": "2.5.2",
     "express": "4.x",
     "express-ws": "0.2.6",
-    "node-uuid": "1.4.3",
-    "url" : "0.11.0 ",
-    "uuid-random" : "1.0.5",
     "jade": "",
-    "ejs":"2.5.2",
-    "date-utils":"1.2.21"
-
-  },
-  "scripts": {
-    "start": "node server/index.js"
+    "node-uuid": "1.4.3",
+    "url": "0.11.0 ",
+    "uuid-random": "1.0.5"
   }
 }
