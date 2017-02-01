@@ -57,6 +57,7 @@ app.get('/lyft', function(req, res){
 	var pathname = url.parse(req.url).pathname;
     //console.log("Request file_path " + pathname[2]+ " received.");
     console.log(req);
+    res.status(200).json({get:"ok"})
     
 });
 
