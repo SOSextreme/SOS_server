@@ -14,60 +14,13 @@ var env = require('dotenv').load();
 console.log(process.env.accountSid);
 var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
+var NodeGeocoder=require('node-geocoder');
 var client = require('twilio')(accountSid, authToken);
 var toNumber = process.env.toNumber;
 var fromNumber = process.env.fromNumber;
 
 
-/*function StoreDataToWebm(data, hashid, ws) {
-    var filePath = '../www/w/';
-    if (!fs.existsSync(filePath)){
-        fs.mkdirSync(filePath);
-    }
-    
-    var livePath = filePath+hashid+'/';
-    var t_hms = new Date().getTime();
-    if (!fs.existsSync(livePath)){
-        console.log('writing meta file');
-        fs.mkdirSync(livePath);
-        prevFilePath = livePath + "meta" + videoFileExtension;
-        fs.writeFileSync(prevFilePath, data);
 
-    }else{
-      
-        // prevFilePath = livePath + t_hms + videoFileExtension;
-        // fs.writeFileSync(prevFilePath, data);
-        //delete previous file
-        // fs.unlinkSync(prevFilePath);
-        broadcast_binary(ws,hashid,data);
-    }
-
-
-    if (!fs.existsSync(filePath + hashid + videoFileExtension)) {
-        console.log('writing original file');
-        fs.writeFileSync(filePath + hashid + videoFileExtension, data);
-    } else {
-        // console.log('appending File')
-        fs.appendFileSync(filePath + hashid + videoFileExtension, data);
-    }
-}
-*/
-function broadcast_binary(ws,hashid,data){
-    // var para = {};
-    // para[key] = data.toString();
-    // console.log(room[hashid]);
-    for(var i in room[hashid]){
-        if(room[hashid][i]!= ws){
-            // console.log("client"+room[hashid][i]);
-            try {
-                room[hashid][i].send(data);
-            }catch(e){
-                room[hashid][i].close();
-                delete room[hashid][i];
-            }
-        }
-    }
-}
 function broadcast(ws,hashid,key,data){
     var para = {};
     para[key] = data.toString();
@@ -85,26 +38,7 @@ function broadcast(ws,hashid,key,data){
     }
 }
 
-/*function deleteRealDir(hashid) {
-    var filePath = '../www/w/';
-    var livePath = filePath+hashid+'/';
-    deleteFolderRecursive(livePath);
 
-}
-*/
-var deleteFolderRecursive = function(path) {
-  if( fs.existsSync(path) ) {
-    fs.readdirSync(path).forEach(function(file,index){
-      var curPath = path + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-};
 
 function close_subscriptions(ws,hashid){
 
@@ -151,14 +85,27 @@ module.exports = function (app) {
 					
                     //console.log(room); 
                     //console.log(data["lng"]); 
+                    
+                    var options={
+                       provider:'google',
+                       httpAdapter:'https',
+                       apiKey:process.env.reverseGeo,
+                       formatter:null
+                    };
+                    var geocoder=NodeGeocoder(options);
+                    geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
+                    {
+                        //latlng to addr
+                        console.log(res[0]["formattedAddress"]);
+                    });
 					ws.send(data["fbid"].toString());
 					client.calls.create({                                  //make outbound call
 						url: "http://demo.twilio.com/docs/voice.xml",
 						to: toNumber,
 						from: fromNumber
 					}, function(err, call) {
-							process.stdout.write(call.sid);
-						});
+							//process.stdout.write(call.sid);
+					});
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
                  
