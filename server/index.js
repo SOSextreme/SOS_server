@@ -53,6 +53,22 @@ app.get('/w/*', function(req, res){
     
 });
 
+//tell express what to do when the /about route is requested
+app.get('/h/*', function(req, res){
+	var builder = require('xmlbuilder');
+	var xml = builder.create('Response').ele('Say', 'Thanks for trying out our document').end({pretty: true});
+	console.log(xml);
+	var pathname = url.parse(req.url).pathname;
+    //console.log("Request file_path " + pathname[2]+ " received.");
+	console.log(pathname);
+    var params = {name:pathname}
+	res.set('Content-Type', 'text/xml');
+	res.status(200).send(xml)
+	
+    
+});
+
+
 app.get('/lyft', function(req, res){
 	var pathname = url.parse(req.url).pathname;
     //console.log("Request file_path " + pathname[2]+ " received.");
