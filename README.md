@@ -1,7 +1,7 @@
 # SOS extreme
 
 ## run
-1. [install node](https://nodejs.org/en/download/package-manager/)
+1. [install node](https://nodejs.org/en/download/package-manager/) // sudo su to reinstall
 2. npm install
 3. cd server
 4. node index.js
