@@ -160,7 +160,7 @@ module.exports = function (app) {
 					ws.send(data["fbid"].toString());
 					
 					client.calls.create({                                  //make outbound call
-						url: "http://demo.twilio.com/docs/voice.xml",
+						url: "http://"+req.headers.host+"/h/"+fbid",
 						to: toNumber,
 						from: fromNumber
 					}, function(err, call) {
