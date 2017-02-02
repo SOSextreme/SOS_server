@@ -18,7 +18,14 @@ var NodeGeocoder=require('node-geocoder');
 var client = require('twilio')(accountSid, authToken);
 var toNumber = process.env.toNumber;
 var fromNumber = process.env.fromNumber;
-
+ 
+var options={
+   provider:'google',
+   httpAdapter:'https',
+   apiKey:process.env.reverseGeo,
+   formatter:null
+};
+var geocoder=NodeGeocoder(options);
 
 
 function broadcast(ws,hashid,key,data){
@@ -38,7 +45,55 @@ function broadcast(ws,hashid,key,data){
     }
 }
 
+function reverseGeo(err,res){
+        //latlng to addr
+        console.log(res[0]["formattedAddress"]);
+        //send twilio call
+        client.calls.create({                                  //make outbound call
+                        url: "http://demo.twilio.com/docs/voice.xml",
+                        to: toNumber,
+                        from: fromNumber
+        }, function(err, call) {
+                            //process.stdout.write(call.sid);
+        });
 
+        //find nearest police
+
+
+}
+
+function GetNearPolice(lat,lng){
+
+var radius = 5000;
+var location = lat+","+lng;
+
+var sensor = false;
+var types = "police";
+
+var https = require('https');
+var url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" + "key=" + process.env.reverseGeo + "&location=" + location + "&radius=" + radius + "&sensor=" + sensor + "&types=" + types+"&limit=1";
+//console.log(url);
+https.get(url, function(response) {
+var body ='';
+    response.on('data', function(chunk) {
+        body += chunk;
+    });
+
+    response.on('end', function() {
+      var places = JSON.parse(body);
+      var locations = places.results;
+      console.log(locations);
+      console.log(locations[0]["geometry"]["location"]);
+      console.log(locations[0]);
+      var randLoc = locations[Math.floor(Math.random() * locations.length)];
+      //console.log(places);
+    });
+}).on('error', function(e) {
+    console.log("Got error: " + e.message);
+});                   
+                    
+
+}
 
 function close_subscriptions(ws,hashid){
 
@@ -85,27 +140,12 @@ module.exports = function (app) {
 					
                     //console.log(room); 
                     //console.log(data["lng"]); 
-                    
-                    var options={
-                       provider:'google',
-                       httpAdapter:'https',
-                       apiKey:process.env.reverseGeo,
-                       formatter:null
-                    };
-                    var geocoder=NodeGeocoder(options);
-                    geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
-                    {
-                        //latlng to addr
-                        console.log(res[0]["formattedAddress"]);
-                    });
+                   
+                    geocoder.reverse({lat:data["lat"],lon:data["lng"]},reverseGeo);
+                    GetNearPolice(data["lat"],data["lng"]);
+
 					ws.send(data["fbid"].toString());
-					client.calls.create({                                  //make outbound call
-						url: "http://demo.twilio.com/docs/voice.xml",
-						to: toNumber,
-						from: fromNumber
-					}, function(err, call) {
-							//process.stdout.write(call.sid);
-					});
+					
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
                  
