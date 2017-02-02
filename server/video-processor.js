@@ -122,7 +122,7 @@ module.exports = function (app) {
         ws.on('message', function(data) {
           
                data = JSON.parse(data);
-			   console.log(data);
+			   //console.log(data);
                //console.log(room[data["fbid"]]);
 			   
 			   //var fbid = data["fbid"];
@@ -138,7 +138,7 @@ module.exports = function (app) {
                     //room[fbid].push(ws);
 					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
 					historyLog[fbid]=[[data["lat"],data["lng"]]];
-					//console.log(historyLog);
+					console.log(historyLog);
 					
                     //console.log(room); 
                     //console.log(data["lng"]); 
@@ -146,7 +146,7 @@ module.exports = function (app) {
                     geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
                     {
 						info[fbid]={Name:"abc",Address:res[0]["formattedAddress"]};
-						console.log(info);
+						//console.log(info);
                         //latlng to addr
                         //console.log(res[0]["formattedAddress"]);
 						// module.js
@@ -171,10 +171,10 @@ module.exports = function (app) {
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
                  
                     broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
-                    console.log(data["lat"]); 
-                    console.log(data["lng"]); 
+                    //console.log(data["lat"]); 
+                    //console.log(data["lng"]); 
 					historyLog[fbid].push([data["lat"],data["lng"]]);
-					console.log(historyLog);
+					//console.log(historyLog);
 
                }else if(data["join"] && !room[data["join"]]){
                     // var para = {};

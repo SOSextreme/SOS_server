@@ -59,11 +59,14 @@ app.get('/w/*', function(req, res){
 
 app.get('/h/*', function(req, res){
 	console.log(info);
+	var pathname = url.parse(req.url).pathname.substring(3);
 	var builder = require('xmlbuilder');
-	var xml = builder.create('Response').ele('Say', info[]).end({pretty: true});
+	var xml = builder.create('Response').ele('Say',{'voice':'alice'}, "I am "+info[pathname]["Name"]+". I am threatened. My current location is "+info[pathname]["Address"]+". Please help. Watch my live location at http://"+req.headers.host+"/w/"+pathname).end({pretty: true});
 	console.log(xml);
-	var pathname = url.parse(req.url).pathname;
+	console.log(req.headers.host);
+	
     //console.log("Request file_path " + pathname[2]+ " received.");
+	console.log(info[pathname]);
 	console.log(pathname);
     var params = {name:pathname}
 	res.set('Content-Type', 'text/xml');
