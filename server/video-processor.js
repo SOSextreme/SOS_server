@@ -8,7 +8,7 @@ require('date-utils');
 var videoFileExtension = '.webm';
 var host = [];
 var room = {};
-var historylog = {};
+var historyLog = {};
 var prevFilePath = '';
 var env = require('dotenv').load();
 console.log(process.env.accountSid);
@@ -18,7 +18,7 @@ var NodeGeocoder=require('node-geocoder');
 var client = require('twilio')(accountSid, authToken);
 var toNumber = process.env.toNumber;
 var fromNumber = process.env.fromNumber;
- 
+var info = {}; 
 var options={
    provider:'google',
    httpAdapter:'https',
@@ -45,7 +45,7 @@ function broadcast(ws,hashid,key,data){
     }
 }
 
-function reverseGeo(err,res){
+/*function reverseGeo(err,res){
         //latlng to addr
         console.log(res[0]["formattedAddress"]);
         //send twilio call
@@ -61,6 +61,8 @@ function reverseGeo(err,res){
 
 
 }
+*/
+
 
 function GetNearPolice(lat,lng){
 
@@ -127,24 +129,43 @@ module.exports = function (app) {
                if(data["join"] && room[data["join"]]){
                     room[data["join"]].push(ws);
 					var para = {};
-					para["history"] = historylog[data["join"]];
-					console.log(historylog[data["join"]]);
+					para["history"] = historyLog[data["join"]];
+					console.log(historyLog[data["join"]]);
 					ws.send(JSON.stringify(para));
                }else if(data["action"]=="sos_live_loc" && data["fbid"]){   //client pass json, id location
                     fbid = parseInt(data["fbid"],10); 
 					room[fbid] = [ws];
                     //room[fbid].push(ws);
 					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
-					historylog[fbid]=[[data["lat"],data["lng"]]];
-					//console.log(historylog);
+					historyLog[fbid]=[[data["lat"],data["lng"]]];
+					//console.log(historyLog);
 					
                     //console.log(room); 
                     //console.log(data["lng"]); 
+
+                    geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
+                    {
+						info[fbid]={Name:"abc",Address:res[0]["formattedAddress"]};
+						console.log(info);
+                        //latlng to addr
+                        //console.log(res[0]["formattedAddress"]);
+						// module.js
+
+                    });
+
                    
-                    geocoder.reverse({lat:data["lat"],lon:data["lng"]},reverseGeo);
-                    GetNearPolice(data["lat"],data["lng"]);
+                    //geocoder.reverse({lat:data["lat"],lon:data["lng"]},reverseGeo);
+                    //GetNearPolice(data["lat"],data["lng"]);
 
 					ws.send(data["fbid"].toString());
+					
+					client.calls.create({                                  //make outbound call
+						url: "http://demo.twilio.com/docs/voice.xml",
+						to: toNumber,
+						from: fromNumber
+					}, function(err, call) {
+							//process.stdout.write(call.sid);
+					});
 					
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
@@ -152,8 +173,8 @@ module.exports = function (app) {
                     broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
                     console.log(data["lat"]); 
                     console.log(data["lng"]); 
-					historylog[fbid].push([data["lat"],data["lng"]]);
-					console.log(historylog);
+					historyLog[fbid].push([data["lat"],data["lng"]]);
+					console.log(historyLog);
 
                }else if(data["join"] && !room[data["join"]]){
                     // var para = {};
@@ -163,7 +184,7 @@ module.exports = function (app) {
                
                }
 			   
-             //console.log(historylog);
+             //console.log(historyLog);
         });
         ws.on('close', function(data) {
             //reload clients' <video> to full video 
@@ -182,5 +203,7 @@ module.exports = function (app) {
         });
         //ws.send(hashid);
     });
+	
+	return info;
  
 };

@@ -33,7 +33,8 @@ app.use(express.static('../www/'));
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 const expressWss = expressWs (app, httpServer)
-require('./video-processor')(app);
+var info = require('./video-processor')(app);
+
 
 httpServer.listen(http_port);
 console.log('Listening http on port:' + http_port);
@@ -53,10 +54,13 @@ app.get('/w/*', function(req, res){
     
 });
 
-//tell express what to do when the /about route is requested
+
+
+
 app.get('/h/*', function(req, res){
+	console.log(info);
 	var builder = require('xmlbuilder');
-	var xml = builder.create('Response').ele('Say', 'Thanks for trying out our document').end({pretty: true});
+	var xml = builder.create('Response').ele('Say', info[]).end({pretty: true});
 	console.log(xml);
 	var pathname = url.parse(req.url).pathname;
     //console.log("Request file_path " + pathname[2]+ " received.");
