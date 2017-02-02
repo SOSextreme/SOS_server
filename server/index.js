@@ -12,6 +12,7 @@ const default_port = 7575;
 const http_port = 9000;
 const https = require('https')
 const http = require('http')
+const twilio = require('twilio');
 
 
 const credentials = {
@@ -56,8 +57,18 @@ app.get('/w/*', function(req, res){
 
 
 
+app.post('/h/*', function (req, res){
+  // Use the Twilio Node.js SDK to build an XML response
+  var pathname = url.parse(req.url).pathname.substring(3);
+  let twiml = new twilio.TwimlResponse();
+  twiml.say("I am "+info[pathname]["Name"]+". I am threatened. My current location is "+info[pathname]["Address"]+". Please help. Watch my live location at http://"+req.headers.host+"/w/"+pathname, { voice: 'alice' });
 
-app.get('/h/*', function(req, res){
+  // Render the response as XML in reply to the webhook request
+  res.type('text/xml');
+  res.send(twiml.toString());
+});
+
+/*app.get('/h/*', function(req, res){
 	console.log(info);
 	var pathname = url.parse(req.url).pathname.substring(3);
 	var builder = require('xmlbuilder');
@@ -73,7 +84,7 @@ app.get('/h/*', function(req, res){
 	res.status(200).send(xml)
 	
     
-});
+});*/
 
 
 app.get('/lyft', function(req, res){

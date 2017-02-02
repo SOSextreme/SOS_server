@@ -158,14 +158,19 @@ module.exports = function (app) {
                     //GetNearPolice(data["lat"],data["lng"]);
 
 					ws.send(data["fbid"].toString());
-					
+					console.log("http://"+req.headers.host+"/h/"+fbid);
 					client.calls.create({                                  //make outbound call
 						url: "http://"+req.headers.host+"/h/"+fbid,
+						//url: "http://demo.twilio.com/docs/voice.xml",
+						//url: "http://54.221.40.5:9000/h/123",
 						to: toNumber,
 						from: fromNumber
 					}, function(err, call) {
+						console.log(err);
 							//process.stdout.write(call.sid);
 					});
+					
+					
 					
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
