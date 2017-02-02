@@ -45,23 +45,6 @@ function broadcast(ws,hashid,key,data){
     }
 }
 
-/*function reverseGeo(err,res){
-        //latlng to addr
-        console.log(res[0]["formattedAddress"]);
-        //send twilio call
-        client.calls.create({                                  //make outbound call
-                        url: "http://demo.twilio.com/docs/voice.xml",
-                        to: toNumber,
-                        from: fromNumber
-        }, function(err, call) {
-                            //process.stdout.write(call.sid);
-        });
-
-        //find nearest police
-
-
-}
-*/
 
 
 function GetNearPolice(lat,lng){
@@ -146,11 +129,13 @@ module.exports = function (app) {
                     geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
                     {
 						info[fbid]={Name:"abc",Address:res[0]["formattedAddress"]};
-						//console.log(info);
-                        //latlng to addr
-                        //console.log(res[0]["formattedAddress"]);
-						// module.js
-
+						client.messages.create({
+							to: toNumber,
+							from: fromNumber,
+							body: "I am "+info[fbid]["Name"]+". I am threatened. My current location is "+info[fbid]["Address"]+". Please help. Watch my live location at http://"+req.headers.host+"/w/"+fbid,
+					}, function (err, message) {
+							console.log(message.sid);
+						});
                     });
 
                    
@@ -170,7 +155,7 @@ module.exports = function (app) {
 							//process.stdout.write(call.sid);
 					});
 					
-					
+				
 					
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
