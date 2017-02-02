@@ -21,6 +21,7 @@
     "node-uuid": "1.4.3",
     "twilio": "^2.11.1",
     "url": "0.11.0 ",
-    "uuid-random": "1.0.5"
+    "uuid-random": "1.0.5",
+    "xmlbuilder": "^8.2.2"
   }
 }
