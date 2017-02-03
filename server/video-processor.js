@@ -19,6 +19,8 @@ var client = require('twilio')(accountSid, authToken);
 var toNumber = process.env.toNumber;
 var fromNumber = process.env.fromNumber;
 var info = {}; 
+var querystring = require('querystring');
+var request = require('request');
 var options={
    provider:'google',
    httpAdapter:'https',
@@ -26,6 +28,20 @@ var options={
    formatter:null
 };
 var geocoder=NodeGeocoder(options);
+const cognitiveServices = require('cognitive-services')
+var computerVision = cognitiveServices.computerVision({
+	apiKey:process.env.computerVision
+})
+var cvParameters = {
+	visualFeatures: "Categories",
+    details: "{string}",
+    language: "en"
+};
+
+
+//var cvBody = {
+//	url:"data["url"]"
+//}
 
 
 function broadcast(ws,hashid,key,data){
@@ -44,6 +60,7 @@ function broadcast(ws,hashid,key,data){
         }
     }
 }
+
 
 
 
@@ -122,7 +139,23 @@ module.exports = function (app) {
 					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
 					historyLog[fbid]=[[data["lat"],data["lng"]]];
 					console.log(historyLog);
-					
+					var cvBody = {
+						"url":data["url"]
+					};
+					var cvBodyData = JSON.stringify(cvBody);
+					console.log(cvBodyData);
+					request({
+						headers: {
+							"Content-Type":"application/json",
+							"Ocp-Apim-Subscription-Key":process.env.computerVision
+						},
+						url: "https://westus.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=description,faces,categories",
+						body: cvBodyData,
+						method: 'POST'
+						}, function (err, res, body) {
+							console.log(res)
+						});
+					console.log(data["url"]);
                     //console.log(room); 
                     //console.log(data["lng"]); 
 
@@ -134,7 +167,7 @@ module.exports = function (app) {
 							from: fromNumber,
 							body: "I am "+info[fbid]["Name"]+". I am threatened. My current location is "+info[fbid]["Address"]+". Please help. Watch my live location at http://"+req.headers.host+"/w/"+fbid,
 					}, function (err, message) {
-							console.log(message.sid);
+							//console.log(message.sid);
 						});
                     });
 

@@ -44,6 +44,8 @@ function init() {
         connection.onopen = function () {
          //generate uuid and send to server. include location.   check geo_marker
 		 var obj = new Object();
+		 //console.log(document.getElementsByName('criminal_img')[0].value);
+		 obj.url = document.getElementsByName('criminal_img')[0].value;
 		 obj.action = "sos_live_loc";
 		 obj.fbid=123;
 		 if (geo_marker!=null){

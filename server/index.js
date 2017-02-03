@@ -5,7 +5,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const expressWs = require('express-ws');
-
+const cognitiveServices = require('cognitive-services')
 const url = require('url');
 const fs = require('fs')
 const default_port = 7575;
@@ -35,6 +35,7 @@ const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 const expressWss = expressWs (app, httpServer)
 var info = require('./video-processor')(app);
+
 
 
 httpServer.listen(http_port);
@@ -68,23 +69,7 @@ app.post('/h/*', function (req, res){
   res.send(twiml.toString());
 });
 
-/*app.get('/h/*', function(req, res){
-	console.log(info);
-	var pathname = url.parse(req.url).pathname.substring(3);
-	var builder = require('xmlbuilder');
-	var xml = builder.create('Response').ele('Say',{'voice':'alice'}, "I am "+info[pathname]["Name"]+". I am threatened. My current location is "+info[pathname]["Address"]+". Please help. Watch my live location at http://"+req.headers.host+"/w/"+pathname).end({pretty: true});
-	console.log(xml);
-	console.log(req.headers.host);
-	
-    //console.log("Request file_path " + pathname[2]+ " received.");
-	console.log(info[pathname]);
-	console.log(pathname);
-    var params = {name:pathname}
-	res.set('Content-Type', 'text/xml');
-	res.status(200).send(xml)
-	
-    
-});*/
+
 
 
 app.get('/lyft', function(req, res){
