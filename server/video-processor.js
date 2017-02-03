@@ -28,20 +28,11 @@ var options={
    formatter:null
 };
 var geocoder=NodeGeocoder(options);
-const cognitiveServices = require('cognitive-services')
-var computerVision = cognitiveServices.computerVision({
-	apiKey:process.env.computerVision
-})
-var cvParameters = {
-	visualFeatures: "Categories",
-    details: "{string}",
-    language: "en"
-};
 
 
-//var cvBody = {
-//	url:"data["url"]"
-//}
+
+
+
 
 
 function broadcast(ws,hashid,key,data){

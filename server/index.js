@@ -5,7 +5,6 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const expressWs = require('express-ws');
-const cognitiveServices = require('cognitive-services')
 const url = require('url');
 const fs = require('fs')
 const default_port = 7575;
@@ -34,6 +33,13 @@ app.use(express.static('../www/'));
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 const expressWss = expressWs (app, httpServer)
+var io = require('socket.io')(httpServer);
+io.on('connection', function(client){
+  client.on('init', function(data){
+      console.log(data);
+  });
+});
+
 var info = require('./video-processor')(app);
 
 
