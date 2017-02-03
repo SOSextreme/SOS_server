@@ -34,9 +34,11 @@ const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
 const expressWss = expressWs (app, httpServer)
 var io = require('socket.io')(httpServer);
-io.on('connection', function(client){
-  client.on('init', function(data){
-      console.log(data);
+
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
   });
 });
 
