@@ -5,13 +5,30 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const expressWs = require('express-ws');
-const url = require('url');
 const fs = require('fs')
 const default_port = 7575;
 const http_port = 9000;
 const https = require('https')
 const http = require('http')
 const twilio = require('twilio');
+var url = require('url');
+var historyLog = {};
+var env = require('dotenv').load();
+var accountSid = process.env.accountSid;
+var authToken = process.env.authToken;
+var NodeGeocoder=require('node-geocoder');
+var client = require('twilio')(accountSid, authToken);
+var toNumber = process.env.toNumber;
+var fromNumber = process.env.fromNumber;
+var info = {}; 
+var request = require('request');
+var options={
+   provider:'google',
+   httpAdapter:'https',
+   apiKey:process.env.reverseGeo,
+   formatter:null
+};
+var geocoder=NodeGeocoder(options);
 
 
 const credentials = {
@@ -32,22 +49,49 @@ app.use(express.static('../www/'));
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
-const expressWss = expressWs (app, httpServer)
+
 var io = require('socket.io')(httpServer);
-io.on('connection', function(client){
-  client.on('init', function(data){
-      console.log(data);
+
+io.on('connection', function (socket) {
+  
+  socket.on('join', function (data) {
+    console.log(data["join"]);
+    socket.join(data["join"]);
+    console.log(historyLog[data["join"]]);
+    socket.emit('histroy', historyLog[data["join"]]);
+
   });
+ 
+
+  socket.on('init', function (data) {
+
+    socket.join(data["fbId"]);
+    console.log(data);
+    historyLog[data["fbId"]] = [[data["lat"],data["lng"]]];
+    socket.emit('liveUrl', data["fbId"]);
+
+  });
+
+  socket.on('live_update', function (data) {
+    historyLog[data["fbId"]].push([data["lat"],data["lng"]]);
+  });
+
+  socket.on('criminal_img', function (data) {
+    console.log(data);
+  });
+
 });
 
-var info = require('./video-processor')(app);
+
+
+
+
 
 
 
 httpServer.listen(http_port);
 console.log('Listening http on port:' + http_port);
-httpsServer.listen(default_port);
-console.log('Listening https on port:' + default_port);
+
 // app.listen(port, function () {
 //     console.log('Listening on port:' + port);
    

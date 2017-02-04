@@ -19,7 +19,6 @@ var client = require('twilio')(accountSid, authToken);
 var toNumber = process.env.toNumber;
 var fromNumber = process.env.fromNumber;
 var info = {}; 
-var querystring = require('querystring');
 var request = require('request');
 var options={
    provider:'google',
