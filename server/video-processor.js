@@ -202,14 +202,19 @@ module.exports = function (app) {
 						}, function (err, res, body) {
 							//jsonString += body ;
 							jsonData = JSON.parse(body);
+							console.log(jsonData);
 							//console.log(JSON.parse(jsonString));
 							var criminalInfo = {};
 							criminalInfo['Picture']=data["url"];
-							criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+							if(jsonData['description']['captions'][0]){
+								criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+							}
+							if(jsonData['faces'][0]){
 							criminalInfo['Age']=jsonData['faces'][0]['age'];
 							criminalInfo['Gender']=jsonData['faces'][0]['gender'];
+							}
 							criminalInfoDb[fbid] = criminalInfo;
-							//console.log(criminalInfo);
+							console.log(criminalInfo);
 							
 							
 						});

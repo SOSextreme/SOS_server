@@ -42,6 +42,8 @@ Chat.connect = (function(host) {
             center: {lat: 40.8075355, lng: -73.9625727},
             mapTypeId: google.maps.MapTypeId.ROADMAP
         });
+		
+		
          var subscription ={};
          subscription.join = token;
          Chat.sendMessage(JSON.stringify(subscription));
@@ -64,7 +66,7 @@ Chat.connect = (function(host) {
         var action = JSON.parse(message.data);
 		if(action["history"] != null) plotHistory(action["history"]);
         if(action["help"] != null) plotPoints(action["help"]);
-		if(action["CriminalInformation"] != null) console.log(action["CriminalInformation"]);
+		if(action["CriminalInformation"] != null) loadInfo(action["CriminalInformation"]);
 		//console.log(action["history"]);
 		//console.log(action["help"]);
 		console.log(action);
@@ -73,9 +75,13 @@ Chat.connect = (function(host) {
 
 });
 function loadInfo(data){
-	
+	var img = document.getElementById('cimg');
+		img.src= data["Picture"];
+		console.log(img);
 }
 function plotHistory(data){
+	//console.log(data);
+	
 	for (var i = 0; i < data.length; i++){
 		var latlng = data[i];
 		latlng = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
