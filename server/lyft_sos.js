@@ -32,12 +32,13 @@ var body ='';
     response.on('end', function() {
       var places = JSON.parse(body);
       var locations = places.results;
-      //console.log(locations);
-      if(locations[0]){
+      console.log(locations);
+      //if(locations[0]){
+
 		  var des=locations[0]["geometry"]["location"];
 		 
 		  request_lyft(lat,lng,des['lat'],des['lng'])
-      }
+      //}
       //console.log(places);
       
       
@@ -68,7 +69,7 @@ function request_lyft(from_lat,from_lng, to_lat,to_lng){
 				}, function (err, res, body) {
 						console.log(err);
 						var cancel_ride=JSON.parse(body)
-						setTimeout(cancel_lyft_request, 4000, cancel_ride["ride_id"]);
+						setTimeout(cancel_lyft_request, 5000, cancel_ride["ride_id"]);
 					});
 
 }
