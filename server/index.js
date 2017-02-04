@@ -113,8 +113,8 @@ function img_congitive(fbid,url){
               //jsonString += body ;
            
               var jsonData = JSON.parse(body);
-              console.log(jsonData);
-              if(jsonData["statusCode"] ==200){
+              //console.log(jsonData);
+              if(jsonData["description"]){
                 //console.log(JSON.parse(jsonString));
                 var criminalInfo = {};
                 criminalInfo['Picture']=url;
