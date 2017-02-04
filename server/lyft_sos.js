@@ -1,4 +1,5 @@
 
+var env = require('dotenv').load();
 var request = require('request');
 
 module.exports = function (lat,lng) {
