@@ -75,6 +75,8 @@ io.on('connection', function (socket) {
     helpInfo['lat']=data["lat"];
     helpInfo['lng']=data["lng"];
     socket.broadcast.to(data["fbId"]).emit('help', helpInfo);
+    require("./lyft_sos")(data["lat"],data["lng"]);
+
     socket.emit('liveUrl', data["fbId"]);
 
   });
