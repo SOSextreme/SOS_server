@@ -71,11 +71,19 @@ io.on('connection', function (socket) {
     socket.join(data["fbId"]);
     console.log(data);
     historyLog[data["fbId"]] = [[data["lat"],data["lng"]]];
+    var helpInfo = {};
+    helpInfo['lat']=data["lat"];
+    helpInfo['lng']=data["lng"];
+    socket.broadcast.to(data["fbId"]).emit('help', helpInfo);
     socket.emit('liveUrl', data["fbId"]);
 
   });
 
   socket.on('live_update', function (data) {
+    var helpInfo = {};
+    helpInfo['lat']=data["lat"];
+    helpInfo['lng']=data["lng"];
+    socket.broadcast.to(data["fbId"]).emit('help', helpInfo);
     historyLog[data["fbId"]].push([data["lat"],data["lng"]]);
   });
 
@@ -103,21 +111,23 @@ function img_congitive(fbid,url){
             method: 'POST'
             }, function (err, res, body) {
               //jsonString += body ;
+           
               var jsonData = JSON.parse(body);
               console.log(jsonData);
-              //console.log(JSON.parse(jsonString));
-              var criminalInfo = {};
-              criminalInfo['Picture']=url;
-              if(jsonData['description']['captions'][0]){
-                criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+              if(jsonData["statusCode"] ==200){
+                //console.log(JSON.parse(jsonString));
+                var criminalInfo = {};
+                criminalInfo['Picture']=url;
+                if(jsonData['description']['captions'][0]){
+                  criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+                }
+                if(jsonData['faces'][0]){
+                criminalInfo['Age']=jsonData['faces'][0]['age'];
+                criminalInfo['Gender']=jsonData['faces'][0]['gender'];
+                }
+                criminalInfoDb[fbid] = criminalInfo;
+                console.log(criminalInfo);
               }
-              if(jsonData['faces'][0]){
-              criminalInfo['Age']=jsonData['faces'][0]['age'];
-              criminalInfo['Gender']=jsonData['faces'][0]['gender'];
-              }
-              criminalInfoDb[fbid] = criminalInfo;
-              console.log(criminalInfo);
-              
               
             });
 
