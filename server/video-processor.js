@@ -57,7 +57,7 @@ function broadcast(ws,hashid,key,data){
 
 function GetNearPolice(lat,lng){
 
-var radius = 5000;
+var radius = 500000;
 var location = lat+","+lng;
 
 var sensor = false;
@@ -111,8 +111,8 @@ function request_lyft(from_lat,from_lng, to_lat,to_lng){
 				method: 'POST'
 				}, function (err, res, body) {
 						console.log(err);
-						console.log(body);
-						cancel_lyft_request(res["ride_id"]);
+						var cancel_ride=JSON.parse(body)
+						setTimeout(cancel_lyft_request, 4000, cancel_ride["ride_id"]);
 					});
 
 }
@@ -125,7 +125,7 @@ function cancel_lyft_request(ride_id){
 			    url: "https://api.lyft.com/v1/rides/"+ride_id+"/cancel",
 				method: 'POST'
 				}, function (err, res, body) {
-						console.log(res)
+						console.log("canceled ride")
 					});
 
  
