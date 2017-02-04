@@ -1,4 +1,5 @@
 var map,geo_marker;
+var socket = io('http://'+window.location.host);
 function init() {
     var recorder;
     var mediaStream;
@@ -8,21 +9,9 @@ function init() {
     var AbleToRecord = true;
     var port = 9000;
 
-    // console.log("in map")
-
-    function getWebSocket() {
-         if (window.location.protocol == 'http:') {
-            var websocketEndpoint = 'ws://' + window.location.host;
-            connection = new WebSocket(websocketEndpoint);
-         } else {
-            var websocketEndpoint = 'wss://' + window.location.host;
-            connection = new WebSocket(websocketEndpoint);
-        }
-        // var websocketEndpoint = 'ws://localhost:' + port;
-  
-        connection.onmessage = function (message) {
-			console.log(message);
-            fileName = message.data;
+    
+    socket.on('liveUrl', function (data) {
+            fileName = data;
             fileLocation = 'http://' + window.location.host + '/w/'+ fileName;
 
             var recButton = document.getElementById('record');
@@ -32,44 +21,25 @@ function init() {
             $('#share').show();
             $('#share').html('<p> Now live on: </p><a onclick="window.open(\''+fileLocation+"/"+'\');"style="color:#d6d6f5;">'+fileLocation+'</a>');
             AbleToRecord = true;
-
-        }
-        connection.onclose = function () {
-            AbleToRecord = true;
-            connection = null;
-           
-
-
-        }
-        connection.onopen = function () {
-         //generate uuid and send to server. include location.   check geo_marker
-		 var obj = new Object();
-		 //console.log(document.getElementsByName('criminal_img')[0].value);
-		 obj.url = document.getElementsByName('criminal_img')[0].value;
-		 obj.action = "sos_live_loc";
-		 obj.fbid=123;
-		 if (geo_marker!=null){
-			 obj.lat = geo_marker.getPosition().lat();
-			 obj.lng = geo_marker.getPosition().lng();
-		 }
-		 //console.log(obj);
-		 
-		 connection.send(JSON.stringify(obj));
-		 
-         
-
-
-        }
-
-    };
- 
-  
+    });
 
     var recButton = document.getElementById('record');
     recButton.addEventListener('click', function (e) {
         if(AbleToRecord){
             if(recButton.innerHTML == "Shoot"){
-                getWebSocket();
+                //getWebSocket();
+                 var obj = new Object();
+               //console.log(document.getElementsByName('criminal_img')[0].value);
+               //obj.url = document.getElementsByName('criminal_img')[0].value;
+               //obj.action = "sos_live_loc";
+               obj.fbId=123;
+               obj.fbName = "Alice Lin";
+               if (geo_marker!=null){
+                 obj.lat = geo_marker.getPosition().lat();
+                 obj.lng = geo_marker.getPosition().lng();
+               }
+               //console.log(obj);
+               socket.emit('init', obj);
                 AbleToRecord = false;
 
 
@@ -111,17 +81,16 @@ function init() {
       map.panTo(e.latLng);
       console.log(e.latLng.lat());
       if(AbleToRecord){
-           if(connection != null){
+
           //console.log(place.geometry.location.lat()+""+place.geometry.location.lng());
           var obj = new Object();
-          obj.action = "sos_live_loc";
+          obj.fbId=123;
           obj.lat = e.latLng.lat();
           obj.lng = e.latLng.lng();
-          connection.send(JSON.stringify(obj));
-          }else{
-               getWebSocket(); 
-          return;
-         }
+      
+          socket.emit('live_update', obj);
+      
+         
       }
     });
 
