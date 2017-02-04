@@ -38,9 +38,11 @@ function init(){
 
 
      socket.emit('join', subscription);
-     socket.on('histroy', function (data) {
-        
-        plotHistory(data);
+     socket.on('history', function (data) {
+        console.log(data);
+        console.log(data["history"]);
+        plotHistory(data["history"]);
+        loadInfo(data["CriminalInformation"]);
     });
 	 socket.on('help', function (data) {
         

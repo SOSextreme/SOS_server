@@ -29,7 +29,7 @@ var options={
    formatter:null
 };
 var geocoder=NodeGeocoder(options);
-
+var criminalInfoDb = {};
 
 const credentials = {
   cert: fs.readFileSync(path.join(__dirname, 'ssl', 'server.crt')),
@@ -55,10 +55,13 @@ var io = require('socket.io')(httpServer);
 io.on('connection', function (socket) {
   
   socket.on('join', function (data) {
-    console.log(data["join"]);
+   
     socket.join(data["join"]);
-    console.log(historyLog[data["join"]]);
-    socket.emit('histroy', historyLog[data["join"]]);
+    //console.log(historyLog[data["join"]]);
+    var para = {};
+    para["history"] = historyLog[data["join"]];
+    para["CriminalInformation"] = criminalInfoDb[data["join"]];
+    socket.emit('history', para);
 
   });
  
@@ -77,12 +80,49 @@ io.on('connection', function (socket) {
   });
 
   socket.on('criminal_img', function (data) {
-    console.log(data);
+    img_congitive(data["fbId"],data["url"]);
+    
   });
 
 });
 
+function img_congitive(fbid,url){
 
+          var cvBody = {
+            "url":url
+          };
+          var cvBodyData = JSON.stringify(cvBody);
+          console.log(cvBodyData);
+          request({
+            headers: {
+              "Content-Type":"application/json",
+              "Ocp-Apim-Subscription-Key":process.env.computerVision
+            },
+            url: "https://westus.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=description,faces",
+            body: cvBodyData,
+            method: 'POST'
+            }, function (err, res, body) {
+              //jsonString += body ;
+              var jsonData = JSON.parse(body);
+              console.log(jsonData);
+              //console.log(JSON.parse(jsonString));
+              var criminalInfo = {};
+              criminalInfo['Picture']=url;
+              if(jsonData['description']['captions'][0]){
+                criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+              }
+              if(jsonData['faces'][0]){
+              criminalInfo['Age']=jsonData['faces'][0]['age'];
+              criminalInfo['Gender']=jsonData['faces'][0]['gender'];
+              }
+              criminalInfoDb[fbid] = criminalInfo;
+              console.log(criminalInfo);
+              
+              
+            });
+
+
+}
 
 
 

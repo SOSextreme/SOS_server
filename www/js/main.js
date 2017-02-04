@@ -21,6 +21,10 @@ function init() {
             $('#share').show();
             $('#share').html('<p> Now live on: </p><a onclick="window.open(\''+fileLocation+"/"+'\');"style="color:#d6d6f5;">'+fileLocation+'</a>');
             AbleToRecord = true;
+            var obj = new Object();
+            obj.url = document.getElementsByName('criminal_img')[0].value;
+            obj.fbId=123;
+            socket.emit('criminal_img', obj);
     });
 
     var recButton = document.getElementById('record');
