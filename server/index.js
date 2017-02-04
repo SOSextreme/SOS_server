@@ -122,11 +122,37 @@ app.post('/h/*', function (req, res){
 
 
 
-app.get('/lyft', function(req, res){
-	var pathname = url.parse(req.url).pathname;
+app.get('/lyft', function(req, response){
     //console.log("Request file_path " + pathname[2]+ " received.");
-    console.log(req);
-    res.status(200).json({get:"ok"})
+    
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    var request = require('request');
+    console.log(query['code']);
+    var getcodeBody = {
+						"grant_type":"authorization_code",
+						"code": query['code']
+	  };
+	 var getcodeBodyData = JSON.stringify(getcodeBody);
+	 var user = process.env.client_id;
+     var pass = process.env.client_secret;
+
+     var auth = new Buffer(user + ':' + pass).toString('base64');
+	 request({
+			    headers: {
+							"Content-Type":"application/json",
+							'Authorization': 'Basic ' + auth
+						},
+			    url: "https://api.lyft.com/oauth/token",
+				body: getcodeBodyData,
+				method: 'POST'
+				}, function (err, res, body) {
+						console.log(err);
+						var token=JSON.parse(body);
+						console.log(token['access_token']);
+                       
+						response.status(200).send(token['access_token']);
+					});
     
 });
 

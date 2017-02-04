@@ -47,7 +47,7 @@ function init(){
 
  
 
-  
+
 function plotHistory(data){
 	for (var i = 0; i < data.length; i++){
 		var latlng = data[i];
@@ -71,8 +71,8 @@ function plotHistory(data){
 }
   
 function plotPoints(data){
-    var latlng = data.split(",");
-    latlng  = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
+    
+    latlng  = new google.maps.LatLng(parseFloat(data["lat"]),parseFloat(data["lng"]));
     if(cur==null){
         cur = new google.maps.Marker({
         map: map,
