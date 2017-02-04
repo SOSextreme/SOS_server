@@ -59,18 +59,22 @@ Chat.connect = (function(host) {
     };
 
     Chat.socket.onmessage = function (message) {
-    	  console.log(message.data);
+    	 console.log(message.data);
+		 
         var action = JSON.parse(message.data);
 		if(action["history"] != null) plotHistory(action["history"]);
         if(action["help"] != null) plotPoints(action["help"]);
+		if(action["CriminalInformation"] != null) console.log(action["CriminalInformation"]);
 		//console.log(action["history"]);
 		//console.log(action["help"]);
-     
+		console.log(action);
         return false;
     };
 
 });
-  
+function loadInfo(data){
+	
+}
 function plotHistory(data){
 	for (var i = 0; i < data.length; i++){
 		var latlng = data[i];
@@ -94,8 +98,8 @@ function plotHistory(data){
 }
   
 function plotPoints(data){
-    var latlng = data.split(",");
-    latlng  = new google.maps.LatLng(parseFloat(latlng[0]),parseFloat(latlng[1]));
+    
+    latlng  = new google.maps.LatLng(parseFloat(data["lat"]),parseFloat(data["lng"]));
     if(cur==null){
         cur = new google.maps.Marker({
         map: map,
