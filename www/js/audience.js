@@ -62,7 +62,10 @@ function init(){
 function loadInfo(data){
 	var img = document.getElementById('cimg');
 		img.src= data["Picture"];
-		console.log(img);
+	var des = document.getElementById('cdescription');
+		des.innerHTML = data["Description"];
+	var des2 = document.getElementById('cface');
+		des2.innerHTML = "Age: "+data["Age"]+"  Gender: "+data["Gender"];
 }
 
 function plotHistory(data){
