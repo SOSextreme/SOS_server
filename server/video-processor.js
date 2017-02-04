@@ -28,6 +28,9 @@ var options={
    formatter:null
 };
 var geocoder=NodeGeocoder(options);
+var jsonString = '';
+var jsonData = '';
+var criminalInfoDb = {};
 
 
 
@@ -37,8 +40,9 @@ var geocoder=NodeGeocoder(options);
 
 function broadcast(ws,hashid,key,data){
     var para = {};
-    para[key] = data.toString();
+    para[key] = data;
     // console.log(room[hashid]);
+	console.log(para);
     for(var i in room[hashid]){
         if(room[hashid][i]!= ws){
             console.log("client"+room[hashid][i]);
@@ -121,13 +125,19 @@ module.exports = function (app) {
                     room[data["join"]].push(ws);
 					var para = {};
 					para["history"] = historyLog[data["join"]];
+					para["CriminalInformation"] = criminalInfoDb[data["join"]];
 					console.log(historyLog[data["join"]]);
 					ws.send(JSON.stringify(para));
+					console.log(criminalInfoDb[data["join"]]);
+					//broadcast(ws,data["join"],"CriminalInformation",criminalInfoDb[data["join"]]);
                }else if(data["action"]=="sos_live_loc" && data["fbid"]){   //client pass json, id location
                     fbid = parseInt(data["fbid"],10); 
 					room[fbid] = [ws];
                     //room[fbid].push(ws);
-					broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
+					var helpInfo = {};
+					helpInfo['lat']=data["lat"];
+					helpInfo['lng']=data["lng"];
+					broadcast(ws,fbid,"help",data["helpInfo"]);
 					historyLog[fbid]=[[data["lat"],data["lng"]]];
 					console.log(historyLog);
 					var cvBody = {
@@ -140,16 +150,25 @@ module.exports = function (app) {
 							"Content-Type":"application/json",
 							"Ocp-Apim-Subscription-Key":process.env.computerVision
 						},
-						url: "https://westus.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=description,faces,categories",
+						url: "https://westus.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=description,faces",
 						body: cvBodyData,
 						method: 'POST'
 						}, function (err, res, body) {
-							console.log(res)
+							//jsonString += body ;
+							jsonData = JSON.parse(body);
+							//console.log(JSON.parse(jsonString));
+							var criminalInfo = {};
+							criminalInfo['Picture']=data["url"];
+							criminalInfo['Description']=jsonData['description']['captions'][0]['text'];
+							criminalInfo['Age']=jsonData['faces'][0]['age'];
+							criminalInfo['Gender']=jsonData['faces'][0]['gender'];
+							criminalInfoDb[fbid] = criminalInfo;
+							//console.log(criminalInfo);
+							
+							
 						});
-					console.log(data["url"]);
-                    //console.log(room); 
-                    //console.log(data["lng"]); 
-
+					//console.log(jsonData);
+				
                     geocoder.reverse({lat:data["lat"],lon:data["lng"]},function(err,res)
                     {
 						info[fbid]={Name:"abc",Address:res[0]["formattedAddress"]};
@@ -183,8 +202,11 @@ module.exports = function (app) {
 					
 
                }else if(data["action"]=="sos_live_loc" && ! data["fbid"]){
-                 
-                    broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
+					var helpInfo = {};
+					helpInfo['lat']=data["lat"];
+					helpInfo['lng']=data["lng"];
+					broadcast(ws,fbid,"help",helpInfo);
+                    //broadcast(ws,fbid,"help",data["lat"]+","+data["lng"]);
                     //console.log(data["lat"]); 
                     //console.log(data["lng"]); 
 					historyLog[fbid].push([data["lat"],data["lng"]]);
