@@ -79,16 +79,60 @@ var body ='';
     response.on('end', function() {
       var places = JSON.parse(body);
       var locations = places.results;
-      console.log(locations);
-      console.log(locations[0]["geometry"]["location"]);
-      console.log(locations[0]);
+      //console.log(locations);
+      var des=locations[0]["geometry"]["location"];
+      //console.log(locations);
+      //console.log(des);
+      //console.log(locations[0]);
+      request_lyft(lat,lng,des['lat'],des['lng'])
       var randLoc = locations[Math.floor(Math.random() * locations.length)];
       //console.log(places);
+      
+      
+      
     });
 }).on('error', function(e) {
     console.log("Got error: " + e.message);
 });                   
                     
+
+}
+function request_lyft(from_lat,from_lng, to_lat,to_lng){
+     var lyftBody = {
+						"ride_type":"lyft",
+						"origin": {"lat":from_lat,"lng":from_lng},
+						"destination":{"lat":to_lat,"lng":to_lng}
+	  };
+	 var lyftBodyData = JSON.stringify(lyftBody);
+	 console.log(lyftBodyData);
+	 request({
+			    headers: {
+					        "Authorization":'Bearer '+ process.env.lyft,
+							"Content-Type":"application/json"
+						},
+			    url: "https://api.lyft.com/v1/rides",
+				body: lyftBodyData,
+				method: 'POST'
+				}, function (err, res, body) {
+						console.log(err);
+						console.log(body);
+						cancel_lyft_request(res["ride_id"]);
+					});
+
+}
+function cancel_lyft_request(ride_id){
+        request({
+			    headers: {
+					        "Authorization":'Bearer '+ process.env.lyft,
+							"Content-Type":"application/json"
+						},
+			    url: "https://api.lyft.com/v1/rides/"+ride_id+"/cancel",
+				method: 'POST'
+				}, function (err, res, body) {
+						console.log(res)
+					});
+
+ 
 
 }
 
@@ -140,6 +184,8 @@ module.exports = function (app) {
 					broadcast(ws,fbid,"help",data["helpInfo"]);
 					historyLog[fbid]=[[data["lat"],data["lng"]]];
 					console.log(historyLog);
+					GetNearPolice(data['lat'],data['lng']);
+					
 					var cvBody = {
 						"url":data["url"]
 					};
